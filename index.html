@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ellada Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+body{margin:0}
+[hidden]{display:none!important}
+/* Layout: pitch narrative on the left, a live phone prototype pinned on the right; stacks on phones behind a two-tab switch. */
+:root{
+  --bg:#EEF2F4; --surface:#FFFFFF; --ink:#11212C; --muted:#5A6B76; --line:#D5DEE3;
+  --aegean:#1C5A9C; --aegean-soft:#DCE8F5; --seal:#5E7A1F; --seal-soft:#E6EDD3; --warn:#9A5B00; --warn-soft:#F6E7CC;
+  --phone:#0E1A22;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B151C; --surface:#13222C; --ink:#E6EEF2; --muted:#93A6B2; --line:#24384A;
+  --aegean:#6FA7E6; --aegean-soft:#16304A; --seal:#A9C76A; --seal-soft:#243218; --warn:#E4A94A; --warn-soft:#3A2A10; --phone:#05090C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B151C; --surface:#13222C; --ink:#E6EEF2; --muted:#93A6B2; --line:#24384A;
+  --aegean:#6FA7E6; --aegean-soft:#16304A; --seal:#A9C76A; --seal-soft:#243218; --warn:#E4A94A; --warn-soft:#3A2A10; --phone:#05090C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:48px;align-items:start}
+.tabs{display:none}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--aegean);outline-offset:2px}
+
+/* ---------- pitch ---------- */
+.pitch{display:flex;flex-direction:column;gap:44px;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+.mark{width:30px;height:30px;border-radius:50%;background:var(--aegean);display:grid;place-items:center;color:var(--surface);font-size:15px}
+.hero h1{font-size:clamp(34px,5vw,56px);font-weight:800;letter-spacing:-.025em;margin-top:18px;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--aegean)}
+.hero p{margin-top:16px;color:var(--muted);font-size:18px;max-width:58ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+section h2{font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-.015em}
+section > p.lead{margin-top:10px;color:var(--muted);max-width:62ch}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.pill-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.pill-card h3{font-size:18px}
+.pill-card p{color:var(--muted);font-size:15px}
+.problems{margin-top:16px;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.problems div{display:grid;grid-template-columns:170px minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.problems b{font-family:var(--f-display);font-weight:700}
+.problems span{color:var(--muted)}
+.calc{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.calc label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.calc label output{font-family:var(--f-mono);color:var(--ink);font-size:15px}
+.calc input[type=range]{width:100%;accent-color:var(--aegean)}
+.ctrls{display:flex;flex-direction:column;gap:16px}
+.result{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.row{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.row span{color:var(--muted)}
+.row b{font-family:var(--f-mono)}
+.big{font-family:var(--f-display);font-size:34px;font-weight:800;color:var(--aegean);font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.compare{margin-top:16px;overflow-x:auto}
+.compare table{border-collapse:collapse;width:100%;min-width:520px;font-size:15px}
+.compare th,.compare td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+.compare th{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.compare td:last-child{color:var(--seal);font-weight:600}
+.road{margin-top:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.road div{border-top:3px solid var(--aegean);padding-top:10px}
+.road div:nth-child(n+2){border-top-color:var(--line)}
+.road b{display:block;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.road span{font-weight:600}
+.ask{background:var(--aegean);color:var(--surface);border-radius:18px;padding:26px}
+.ask h2{color:var(--surface)}
+.ask p{margin-top:10px;opacity:.9;max-width:60ch}
+.ask ul{margin:14px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+
+/* ---------- phone ---------- */
+.stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;align-items:center;gap:12px}
+.hint{font-size:13px;color:var(--muted);text-align:center;max-width:34ch}
+.phone{width:100%;max-width:360px;aspect-ratio:9/18.5;background:var(--phone);border-radius:44px;padding:10px;box-shadow:0 30px 60px -30px rgba(10,30,45,.45)}
+.screen{width:100%;height:100%;background:var(--bg);border-radius:35px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.sbar{display:flex;justify-content:space-between;padding:12px 24px 4px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.view{flex:1;overflow-y:auto;padding:6px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--surface);padding:8px 6px 14px}
+.nav button{background:none;border:0;color:var(--muted);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px}
+.nav button[aria-current="true"]{color:var(--aegean)}
+.nav svg{width:20px;height:20px}
+.apptitle{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:-.02em;padding-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.creator{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:left;width:100%;color:inherit}
+.av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;color:#fff;font-size:18px}
+.cinfo{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.cname{font-weight:700;display:flex;align-items:center;gap:6px}
+.csub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seal{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--seal);background:var(--seal-soft);border-radius:999px;padding:2px 7px;white-space:nowrap}
+.seal svg{width:11px;height:11px}
+.resp{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.back{background:none;border:0;color:var(--aegean);font-weight:600;padding:0;align-self:flex-start}
+.prof{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding-top:4px}
+.prof .av{width:72px;height:72px;font-size:28px}
+.prof h3{font-size:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 4px;font-size:11px;color:var(--muted)}
+.stats b{display:block;font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+.offer{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.offer div{min-width:0}
+.offer b{display:block;font-size:14px}
+.offer small{color:var(--muted);font-size:12px}
+.buy{background:var(--aegean);color:var(--surface);border:0;border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px;white-space:nowrap}
+.secline{font-size:12px;color:var(--muted);text-align:center}
+.chathead{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.chathead .av{width:36px;height:36px;font-size:14px}
+.msgs{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:9px 12px;border-radius:16px;font-size:14px;display:flex;flex-direction:column;gap:5px}
+.msg.me{align-self:flex-end;background:var(--aegean);color:var(--surface);border-bottom-right-radius:5px}
+.msg.them{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:5px}
+.tag{font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;align-self:flex-start;border-radius:6px;padding:1px 6px}
+.tag.human{color:var(--seal);background:var(--seal-soft)}
+.tag.team{color:var(--warn);background:var(--warn-soft)}
+.composer{display:flex;gap:8px;padding:10px 14px 0}
+.composer input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 14px;font:inherit;font-size:14px}
+.composer button{border:0;background:var(--aegean);color:var(--surface);border-radius:999px;padding:0 14px;font-weight:700;font-size:14px}
+.sim{display:flex;gap:6px;align-items:center;justify-content:center;font-size:11px;color:var(--muted);padding:6px 14px 10px}
+.sim button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 9px;font-size:11px}
+.sim button[aria-pressed="true"]{border-color:var(--ink);font-weight:700}
+.lvl{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:flex-start}
+.lvl .n{font-family:var(--f-mono);font-size:12px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;border:1px solid var(--line);color:var(--muted)}
+.lvl.done .n{background:var(--seal);color:var(--surface);border-color:var(--seal)}
+.lvl.now{border-color:var(--aegean)}
+.lvl.now .n{background:var(--aegean);color:var(--surface);border-color:var(--aegean)}
+.lvl b{display:block;font-size:14px}
+.lvl small{color:var(--muted);font-size:12px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--aegean);width:60%}
+.fade{border-radius:12px;padding:10px 12px;background:var(--warn-soft);color:var(--warn);display:flex;flex-direction:column;gap:2px}
+.fade.ok{background:var(--seal-soft);color:var(--seal)}
+.fade.bad{background:var(--warn);color:var(--surface)}
+.fade b{font-size:14px}
+.fade small{font-size:12px;opacity:.9}
+.toast{position:absolute;left:14px;right:14px;bottom:76px;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px;font-size:13px;transition:opacity .2s}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:20px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;max-width:1120px;margin:0 auto 20px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+  .tabs button{border:0;background:none;color:var(--muted);padding:8px;border-radius:9px;font-weight:700}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+  body.show-app .pitch{display:none}
+  body:not(.show-app) .stage{display:none}
+  .stage{position:static}
+  .grid3,.road{grid-template-columns:minmax(0,1fr)}
+  .calc{grid-template-columns:minmax(0,1fr)}
+  .problems div{grid-template-columns:minmax(0,1fr);gap:2px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="tabs" role="tablist">
+  <button id="tab-pitch" role="tab" aria-selected="true">Pitch</button>
+  <button id="tab-app" role="tab" aria-selected="false">Try the app</button>
+</div>
+
+<div class="wrap">
+  <main class="pitch">
+    <div class="hero">
+      <div class="brand"><span class="mark">ε</span>Ellada</div>
+      <h1>Pay creators. <em>Talk to the creator.</em></h1>
+      <p>Ellada is a creator platform where every message carries a label showing who wrote it. Fans pay for clear, defined interactions, and creators keep more of what they earn.</p>
+    </div>
+
+    <section>
+      <div class="eyebrow">The problem</div>
+      <h2>Fans pay for closeness they can't verify</h2>
+      <div class="problems">
+        <div><b>Hidden ghostwriters</b><span>On big subscription platforms, many top accounts use paid agency "chatters". Fans believe they're talking to the creator and usually aren't told otherwise.</span></div>
+        <div><b>Scam accounts</b><span>On Telegram and similar apps, accounts with stolen photos and chatbots take gifts and Stars, then deliver nothing.</span></div>
+        <div><b>Same script forever</b><span>The relationship never changes. Every fan gets the same upsell loop, so trust and retention drop.</span></div>
+        <div><b>High platform cut</b><span>The market leader takes 20% of creator earnings, before agency fees.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">The solution</div>
+      <h2>Three rules built into the product</h2>
+      <div class="grid3">
+        <div class="pill-card"><span class="seal"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.6 1.4 2.1-.2.4 2.1L12 4.4 11 6.3l1 1.9-1.9 1.1-.4 2.1-2.1-.2L6 12.6 4.4 11.2l-2.1.2-.4-2.1L0 8.2 1 6.3 0 4.4l1.9-1.1.4-2.1 2.1.2z"/></svg>Written by creator</span><h3>Labelled messages</h3><p>Messages sent from the creator's verified device get a green seal. Team or AI replies are allowed but always labelled.</p></div>
+        <div class="pill-card"><span class="seal" style="color:var(--aegean);background:var(--aegean-soft)">Fixed price</span><h3>Defined offers</h3><p>Fans buy concrete things: a voice note, a 10-minute call, a reply within 48 hours. Missed deadlines refund automatically.</p></div>
+        <div class="pill-card"><span class="seal" style="color:var(--warn);background:var(--warn-soft)">Level 3</span><h3>Relationships that grow</h3><p>Fan levels unlock new kinds of contact over time, from messages to voice to live calls, so the interaction changes.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Retention</div>
+      <h2>Why fans stay after levelling up</h2>
+      <p class="lead">We don't sell content that can be copied. We sell a relationship that can't be.</p>
+      <div class="problems">
+        <div><b>Levels unlock access</b><span>Higher levels open the right to book calls and get personal replies. A screenshot captures nothing a fan can take with them.</span></div>
+        <div><b>Each use is paid</b><span>Unlocked offers still cost money when used. A fan who leaves has already paid for everything they got.</span></div>
+        <div><b>Levels fade</b><span>After 30 days without any interaction, a fan drops one level. Coming back means rebuilding, so ghosting has a cost.</span></div>
+        <div><b>Leaks are traceable</b><span>Every media file carries an invisible watermark tied to the buyer. Leakers lose their account and levels, and we file takedowns.</span></div>
+        <div><b>Personal is worth less to others</b><span>A voice note that says the fan's name and answers their question has little value to anyone else.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Business model</div>
+      <h2>A 12% take rate creators can see</h2>
+      <p class="lead">Ellada earns a commission on every purchase. Move the sliders to model a single creator.</p>
+      <div class="calc">
+        <div class="ctrls">
+          <label for="fans">Paying fans <output id="fansOut">400</output><input id="fans" type="range" min="50" max="5000" step="50" value="400"></label>
+          <label for="spend">Average spend per fan / month <output id="spendOut">€14</output><input id="spend" type="range" min="3" max="60" step="1" value="14"></label>
+          <label for="take">Ellada commission <output id="takeOut">12%</output><input id="take" type="range" min="5" max="20" step="1" value="12"></label>
+        </div>
+        <div class="result">
+          <div class="row"><span>Gross sales / month</span><b id="gross">€5,600</b></div>
+          <div class="row"><span>Creator keeps</span><b id="keep">€4,928</b></div>
+          <div class="row"><span>vs. at a 20% cut</span><b id="diff">+€448</b></div>
+          <div><div class="eyebrow">Ellada revenue / month</div><div class="big" id="rev">€672</div></div>
+        </div>
+      </div>
+      <p class="note">Illustrative numbers. Replace with real pilot data before showing investors.</p>
+    </section>
+
+    <section>
+      <div class="eyebrow">Positioning</div>
+      <h2>How Ellada compares</h2>
+      <div class="compare">
+        <table>
+          <thead><tr><th></th><th>Big subscription sites</th><th>Telegram bots</th><th>Ellada</th></tr></thead>
+          <tbody>
+            <tr><td>Who wrote this message?</td><td>Not shown</td><td>Unknown</td><td>Labelled on every message</td></tr>
+            <tr><td>What do I get for my money?</td><td>Vague subscription + upsells</td><td>Often nothing</td><td>Fixed offers, auto-refund</td></tr>
+            <tr><td>Creator ID & age check</td><td>Yes</td><td>No</td><td>Yes, plus device binding</td></tr>
+            <tr><td>Platform cut</td><td>20%</td><td>Telegram + scam</td><td>12%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Go-to-market</div>
+      <h2>Start safe-for-work, expand later</h2>
+      <p class="lead">Launch with fitness coaches, musicians and gamers in the DACH region. Mainstream payment providers accept them, app stores list them, and they already sell 1:1 time. Adult creators come later, once age verification and a specialised payment processor are in place.</p>
+      <div class="road">
+        <div><b>Q1</b><span>Prototype + 20 pilot creators</span></div>
+        <div><b>Q2</b><span>Verified-device chat, paid offers, Stripe</span></div>
+        <div><b>Q3</b><span>Fan levels, live calls, iOS & Android</span></div>
+        <div><b>Q4</b><span>1,000 creators, evaluate adult vertical</span></div>
+      </div>
+    </section>
+
+    <section class="ask">
+      <div class="eyebrow" style="color:inherit;opacity:.75">The ask</div>
+      <h2>Pre-seed round to reach 1,000 creators</h2>
+      <p>Fill in your amount once you've priced the team and build. Typical uses:</p>
+      <ul>
+        <li>Two engineers for 12 months (mobile + backend)</li>
+        <li>Identity and age verification provider</li>
+        <li>Creator onboarding and legal setup (GmbH, terms, DSA compliance)</li>
+      </ul>
+    </section>
+  </main>
+
+  <aside class="stage">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>Ellada</span></div>
+      <div class="view" id="view"></div>
+      <div id="composerSlot"></div>
+      <nav class="nav">
+        <button data-go="discover" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Discover</button>
+        <button data-go="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg>Messages</button>
+        <button data-go="levels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>My levels</button>
+      </nav>
+      <div class="toast" id="toast" hidden></div>
+    </div></div>
+    <p class="hint">Tap through it. In Messages, switch who replies to see how labels work.</p>
+  </aside>
+</div>
+
+<script>
+const SEAL='<svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.6 1.4 2.1-.2.4 2.1L12 4.4 11 6.3l1 1.9-1.9 1.1-.4 2.1-2.1-.2L6 12.6 4.4 11.2l-2.1.2-.4-2.1L0 8.2 1 6.3 0 4.4l1.9-1.1.4-2.1 2.1.2z"/></svg>';
+const creators=[
+ {id:'mara',name:'Mara Linde',cat:'Fitness',color:'#1C5A9C',bio:'Strength coach, Hamburg',resp:'Replies herself in ~6h',fans:'1.2k',rate:'97%',own:'91%',
+  offers:[['Personal voice note','Reply within 48h','€6'],['Form check video','Send a clip, get feedback','€15'],['10-min live call','Book a slot this week','€29']]},
+ {id:'jonas',name:'Jonas Reiter',cat:'Music',color:'#5E7A1F',bio:'Guitarist & songwriter, Vienna',resp:'Replies himself in ~1d',fans:'640',rate:'94%',own:'100%',
+  offers:[['Song feedback','Upload a demo','€12'],['Riff of the week','Weekly lesson clip','€5/mo'],['15-min lesson call','Live over video','€35']]},
+ {id:'aya',name:'Aya Brandt',cat:'Gaming',color:'#9A5B00',bio:'Speedrunner, Berlin',resp:'Team helps with DMs',fans:'3.4k',rate:'99%',own:'64%',
+  offers:[['Route review','I watch your run','€10'],['Duo session','30 min co-op','€25'],['Shout-out on stream','Next Friday','€8']]},
+];
+let state={view:'discover',cat:'All',creator:creators[0],replier:'creator',level:2,idle:0,msgs:[
+  {me:false,who:'creator',t:'Hey! Thanks for joining my page. What are you training for right now?'},
+  {me:true,t:'First half marathon in March 🙂'},
+  {me:false,who:'team',t:'Great goal! Mara posts a 12-week running block on Mondays. Want the link?'},
+  {me:false,who:'creator',t:'Ooh March is perfect timing. Send me your current weekly km and I\'ll tell you where to start.'},
+]};
+const view=document.getElementById('view'), slot=document.getElementById('composerSlot');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2600)}
+function av(c){return `<span class="av" style="background:${c.color}">${c.name[0]}</span>`}
+function tag(who,c){return who==='creator'
+  ?`<span class="tag human">${SEAL} Written by ${esc(c.name.split(' ')[0])}</span>`
+  :`<span class="tag team">Team reply · labelled</span>`}
+function render(){
+  document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.go===state.view||(state.view==='profile'&&b.dataset.go==='discover')));
+  slot.innerHTML='';
+  if(state.view==='discover'){
+    const cats=['All','Fitness','Music','Gaming'];
+    const list=creators.filter(c=>state.cat==='All'||c.cat===state.cat);
+    view.innerHTML=`<div class="apptitle">Discover</div>
+    <div class="chips">${cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===state.cat}">${c}</button>`).join('')}</div>
+    ${list.map(c=>`<button class="creator" data-open="${c.id}">${av(c)}<span class="cinfo"><span class="cname">${esc(c.name)} <span class="seal">${SEAL}Verified</span></span><span class="csub">${esc(c.bio)}</span><span class="resp">${esc(c.resp)} · ${c.own} own replies</span></span></button>`).join('')}`;
+  }
+  if(state.view==='profile'){
+    const c=state.creator;
+    view.innerHTML=`<button class="back" data-go="discover">‹ Discover</button>
+    <div class="prof">${av(c)}<h3>${esc(c.name)}</h3><span class="seal">${SEAL}ID & device verified</span><p style="color:var(--muted);font-size:14px">${esc(c.bio)}</p>
+    <div class="stats"><div><b>${c.fans}</b>fans</div><div><b>${c.rate}</b>on time</div><div><b>${c.own}</b>own replies</div></div></div>
+    ${c.offers.map((o,i)=>`<div class="offer"><div><b>${esc(o[0])}</b><small>${esc(o[1])}</small></div><button class="buy" data-buy="${i}">${o[2]}</button></div>`).join('')}
+    <p class="secline">Not delivered on time? You get an automatic refund.</p>
+    <button class="buy" data-go="chat" style="padding:11px">Message ${esc(c.name.split(' ')[0])}</button>`;
+  }
+  if(state.view==='chat'){
+    const c=state.creator;
+    view.innerHTML=`<div class="chathead">${av(c)}<div><b>${esc(c.name)}</b><div class="resp">${c.own} of replies written by ${esc(c.name.split(' ')[0])}</div></div></div>
+    <div class="msgs">${state.msgs.map(m=>m.me?`<div class="msg me">${esc(m.t)}</div>`:`<div class="msg them">${tag(m.who,c)}<span>${esc(m.t)}</span></div>`).join('')}</div>`;
+    slot.innerHTML=`<form class="composer" id="form"><input id="msgInput" placeholder="Write a message" autocomplete="off"><button>Send</button></form>
+    <div class="sim">Demo: next reply from <button type="button" data-rep="creator" aria-pressed="${state.replier==='creator'}">Creator</button><button type="button" data-rep="team" aria-pressed="${state.replier==='team'}">Team</button></div>`;
+    view.scrollTop=view.scrollHeight;
+    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const i=document.getElementById('msgInput');const t=i.value.trim();if(!t)return;
+      state.msgs.push({me:true,t});render();
+      setTimeout(()=>{const r=state.replier==='creator'
+        ?['Love that, thanks for telling me!','Okay, voice note coming tonight 🎧','Good question. Short answer: yes, start slower.']
+        :['Thanks! We\'ve passed this to Mara.','Our team can help with booking. Mara reads every message.'];
+        state.msgs.push({me:false,who:state.replier,t:r[Math.floor(Math.random()*r.length)]});if(state.view==='chat')render()},700)});
+  }
+  if(state.view==='levels'){
+    const L=[['Follower','Free posts and comments'],['Supporter','Direct messages with labels'],['Regular','Personal voice notes unlocked'],['Inner circle','Book live video calls'],['Collaborator','Request custom content']];
+    const cur=state.level, days=state.idle, left=30-days;
+    const fade=days===0
+      ?`<div class="fade ok"><b>Active streak</b><small>Last interaction today. Your level holds for 30 days of inactivity.</small></div>`
+      :`<div class="fade ${left<=7?'bad':''}"><b>${days} days inactive</b><small>${left>0?`You drop to ${L[Math.max(cur-1,0)][0]} in ${left} days. Send a message or book something to keep your level.`:''}</small></div>`;
+    view.innerHTML=`<div class="apptitle">My levels</div><p style="font-size:13px;color:var(--muted)">With ${esc(state.creator.name)}. Levels grow with time and real interaction, not just spending.</p>
+    ${fade}
+    ${L.map((l,i)=>{const cls=i<cur?'done':i===cur?'now':'';return `<div class="lvl ${cls}"><span class="n">${i+1}</span><div style="flex:1;min-width:0"><b>${l[0]}</b><small>${l[1]}</small>${cls==='now'&&cur<4?`<div class="bar"><i></i></div><small>3 more conversations to reach ${L[cur+1][0]}</small>`:''}</div></div>`}).join('')}
+    <div class="sim" style="padding:0">Demo: <button type="button" data-idle="10">Skip 10 days</button><button type="button" data-idle="reset">Interact</button></div>`;
+  }
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.go){state.view=t.dataset.go;render()}
+  else if(t.dataset.cat){state.cat=t.dataset.cat;render()}
+  else if(t.dataset.open){state.creator=creators.find(c=>c.id===t.dataset.open);state.view='profile';render()}
+  else if(t.dataset.buy){const o=state.creator.offers[+t.dataset.buy];state.idle=0;toast(`Demo purchase: "${o[0]}" for ${o[2]}. Watermarked to your account. Refund if not delivered.`)}
+  else if(t.dataset.rep){state.replier=t.dataset.rep;render()}
+  else if(t.dataset.idle){
+    if(t.dataset.idle==='reset'){state.idle=0;toast('Interaction logged. Your level is safe for 30 days.')}
+    else{state.idle+=10;if(state.idle>=30){state.idle=0;if(state.level>0){state.level--;toast('30 days inactive: you dropped one level.')}else toast('30 days inactive.')}}
+    render()}
+});
+render();
+
+// calculator
+const $=id=>document.getElementById(id), eur=n=>'€'+Math.round(n).toLocaleString('en-US');
+function calc(){const f=+$('fans').value,s=+$('spend').value,k=+$('take').value/100,g=f*s;
+  $('fansOut').textContent=f.toLocaleString('en-US');$('spendOut').textContent='€'+s;$('takeOut').textContent=Math.round(k*100)+'%';
+  $('gross').textContent=eur(g);$('keep').textContent=eur(g*(1-k));const d=g*(1-k)-g*.8;$('diff').textContent=(d>=0?'+':'−')+eur(Math.abs(d));$('rev').textContent=eur(g*k)}
+['fans','spend','take'].forEach(id=>$(id).addEventListener('input',calc));calc();
+
+// mobile tabs
+const tp=$('tab-pitch'),ta=$('tab-app');
+function tab(app){document.body.classList.toggle('show-app',app);tp.setAttribute('aria-selected',!app);ta.setAttribute('aria-selected',app);window.scrollTo(0,0)}
+tp.onclick=()=>tab(false);ta.onclick=()=>tab(true);
+</script>
+
+</body>
+</html>
